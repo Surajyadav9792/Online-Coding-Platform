@@ -1,3 +1,4 @@
+const Redishclient = require("../config/redis");
 const User=require("../model/user");
 const validate=require("../utils/validator")
 const bcrypt=require('bcrypt'); //(npm i bcrypt)
@@ -63,8 +64,17 @@ const login=async(req,res)=>{
 }
 
 const logout=async(req,res)=>{
-
-
+  try{
+    const {token}=req.cookies;
+    const payload=jwt.decode(token);
+    await Redishclient.set(`token:${token}`,'Blocked');//by this the token is stored in redis as the name of blocked
+    await Redishclient.expireAt(`token:${token}`,payload.exp);//by this the token who store in redis delete after define expire time
+    res.cookie("token",null,{expireAt:new Date(Date.now())});//by this the token is expire in cureent time
+    res.send("Logged Out Successfully");
+  }
+  catch(err){
+    res.status(503).send("Error :"+err.message);
+  }
 }
 
 module.exports={register,login,logout};
