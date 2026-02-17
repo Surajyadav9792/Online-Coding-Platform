@@ -25,5 +25,45 @@ const register= async(req,res) =>{
     }
 }
 
+const login=async(req,res)=>{
+    try{
+       const {emailId,password}=req.body;
+       //if user forgot to written email
+       if(!emailId){ 
+        throw new Error("Invalid Credential")
+       }
+        //if user forgot to written password
+        if(!password){ 
+        throw new Error("Invalid Credential")
+       }
+
+       //here we check the given email and password is present in our database or not
+       const result=await User.findOne({emailId});
+        if(!result){ 
+        throw new Error("Invalid Email")
+       }
+       //here first we write palin password and then stored hash password
+       const match= await bcrypt.compare(password,result.password);
+       if(!match){
+        throw new Error("Invalid Password");
+       }
+        const token=jwt.sign(
+       {_id:result._id, emailId:result.emailId},
+        process.env.JWT_KEY,
+       {expiresIn:60*60}
+   );
+
+    res.cookie('token',token,{maxAge:60*60*1000});//cookies will expire given milisec time
+    res.status(201).send("user login Successfully");
+    }
+
+    catch(err){
+    res.status(401).send("Error: "+err.message);
+    }
+}
+
+const logout=async(req,res)=>{
+
+}
 
 module.exports={register,login,logout};
