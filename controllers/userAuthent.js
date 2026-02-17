@@ -8,12 +8,13 @@ const register= async(req,res) =>{
     try{     
      validate(req.body);
 
-     
+
      req.body.password= await bcrypt.hash(req.body.password,10);
+
      const user=await User.create(req.body);
 
     const token=jwt.sign(
-   {_id:user._id, emailId:user.emailId},
+   {_id:user._id, emailId:user.emailId,role:user.role},
    process.env.JWT_KEY,
    {expiresIn:60*60}
    );
@@ -25,7 +26,6 @@ const register= async(req,res) =>{
       res.status(400).send("Error: "+err.message);
     }
 }
-
 const login=async(req,res)=>{
     try{
        const {emailId,password}=req.body;
@@ -49,7 +49,7 @@ const login=async(req,res)=>{
         throw new Error("Invalid Password");
        }
         const token=jwt.sign(
-       {_id:result._id, emailId:result.emailId},
+       {_id:result._id, emailId:result.emailId,role:result.role},
         process.env.JWT_KEY,
        {expiresIn:60*60}
    );
@@ -62,7 +62,6 @@ const login=async(req,res)=>{
     res.status(401).send("Error: "+err.message);
     }
 }
-
 const logout=async(req,res)=>{
   try{
     const {token}=req.cookies;
@@ -76,5 +75,24 @@ const logout=async(req,res)=>{
     res.status(503).send("Error :"+err.message);
   }
 }
+const adminRegister=async(req,res)=>{
+     try{   
+     validate(req.body);
+     req.body.password= await bcrypt.hash(req.body.password,10);
+     const user=await User.create(req.body);
 
-module.exports={register,login,logout};
+    const token=jwt.sign(
+   {_id:user._id, emailId:user.emailId,role:user.role},
+   process.env.JWT_KEY,
+   {expiresIn:60*60}
+   );
+
+    res.cookie('token',token,{maxAge:60*60*1000});//cookies will expire given milisec time
+    res.status(201).send("user Registered Successfully");
+    }
+    catch(err){
+      res.status(400).send("Error: "+err.message);
+    }
+}
+
+module.exports={register,login,logout,adminRegister};
