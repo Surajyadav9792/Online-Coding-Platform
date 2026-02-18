@@ -6,20 +6,24 @@ const problemSchema=new Schema({
     type:String,
     required:true
   },
+  description:{
+    type:String,
+    required:true
+  },
   difficulty:{
     type:String,
     enum:['easy','medium','hard'],
     required:true
   },
-  explantion:{
+  explanation:{
     type:String,
     required:true
   },
- tags:[{
+   tags:{
    type:String,
    enum:['array','DP','Linklist','graph','string'],
    required:true
- }],
+ },
   visibleTestCases:[
     {
         input:{
@@ -60,14 +64,24 @@ const problemSchema=new Schema({
        }
     }
   ],
+  referrenceSolution:[
+   {
+     language:{
+     type:String,
+     required:true
+    },
+    completeCode:{
+      type:String,
+      required:true
+    }
+   }
+  ],
   problemCreater:{
     type:Schema.Types.ObjectId,
     ref:'user',
     required:true
   }
-},{
-    timestamps:true
-});
+})
 
 const problem=mongoose.model("Problem",problemSchema);
 
