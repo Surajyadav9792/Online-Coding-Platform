@@ -167,4 +167,23 @@ const deleteProblem=async(req,res) =>{
    }
 }
 
-module.exports={CreateProblem,UpdateProblem,deleteProblem};
+const getProblemById = async (req,res) =>{
+    const {id}=req.params;
+   try{
+
+     if(!id){
+        return res.status(400).send("Missing ID Field");
+      }
+      const getProblem=await Problem.findById(id);
+      if(!getProblem){
+        return res.status(400).send("Problem is Missing");
+      }
+
+       res.status(200).send(getProblem);
+   }
+   catch(err){
+         res.status(404).send("Error: "+err);
+   }
+}
+
+module.exports={CreateProblem,UpdateProblem,deleteProblem,getProblemById};
