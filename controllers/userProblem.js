@@ -173,7 +173,7 @@ const getProblemById = async (req,res) =>{
 
      if(!id){
       /* here by the .select() function we can provide data or field as per our
-       wish ans if we want that any particular field is not consider then we need to write (-) in that particular field
+       wish ans if we want that any particular field is not consider then we need to write (-) in that particular field as like -tags
        */
         return res.status(400).send("Missing ID Field").select("_id title description tags difficulty visibleTestCases startCode"); 
       }
@@ -191,7 +191,8 @@ const getProblemById = async (req,res) =>{
 
 const getAllProblem=async (req,res) =>{
    try{
-      const getProblem = await Problem.find({}); //return a array 
+      //here we also use the .select() function 
+      const getProblem = await Problem.find({}.select("_id title description tags difficulty")); //return a array 
    if(getProblem.length==0){
      return res.status(200).send(getProblem); 
    }
