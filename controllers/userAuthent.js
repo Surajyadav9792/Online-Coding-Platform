@@ -3,6 +3,8 @@ const User=require("../model/user");
 const validate=require("../utils/validator")
 const bcrypt=require('bcrypt'); //(npm i bcrypt)
 const jwt=require("jsonwebtoken");//(npm install jsonwebtoken)
+const submission=require("../model/submission");
+const Submission = require("../model/submission");
 
 const register= async(req,res) =>{
     try{     
@@ -94,5 +96,20 @@ const adminRegister=async(req,res)=>{
       res.status(400).send("Error: "+err.message);
     }
 }
+const deleteProfile=async(req,res) =>{
+   try{
+      const userId=req.result._id;
+     //userSchema delete
+      await User.findByIdAndUpdate(userId);
 
-module.exports={register,login,logout,adminRegister};
+      // Also delete through submission
+      await Submission.deleteMany({userId}); //by this the userId id deleted from everyWhere
+
+      res.status(200).send("Deleted Successfully");
+   }
+   catch(err){
+    res.status(500).send("Internal Server Error ");
+   }
+}
+
+module.exports={register,login,logout,adminRegister,deleteProfile};
