@@ -88,5 +88,42 @@ catch(err){
     res.status(500).send("Internal server error: "+err);
 }
 }
+const runCode=async(req,res) =>{
+   try{
+ const userId=req.result._id;
+ const problemId=req.params._id;
 
-module.exports=submitCode;
+ const {code,language}=req.body;
+ if(!userId||!problemId||!code||!language){
+    return res.status().send("Some field is Missing");
+ }
+
+ //Fetch the problem from database
+ const problem=await Problem.findById(problemId);
+
+   // get language id for judge0
+    const languageId=getlanguageById(language);
+
+     const submissions=problem.visibleTestCases.map((testcase)=>({
+       source_code:code,
+       language_id:languageId,
+       stdin:testcase.input,
+       expected_output:testcase.output 
+    }));
+
+    const submitResult=await submitBatch(submissions);
+
+    const resultToken=submitResult.map((value)=>value.token);
+
+     const testResult=await submitToken(resultToken);
+    // console.log(testResult);
+ 
+     res.status(201).send(testResult);
+}
+
+catch(err){
+    res.status(500).send("Internal server error: "+err);
+}
+}
+
+module.exports={submitCode,runCode};

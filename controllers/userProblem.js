@@ -1,5 +1,6 @@
 const {getlanguageById,submitBatch,submitToken}=require("../utils/fetch_language_id");
 const Problem = require("../model/problem");
+const User=require("../model/user");
 
 const CreateProblem=async (req,res)=>{
 
@@ -192,8 +193,8 @@ const getProblemById = async (req,res) =>{
 const getAllProblem=async (req,res) =>{
    try{
       //here we also use the .select() function 
-      const getProblem = await Problem.find({}.select("_id title description tags difficulty")); //return a array 
-   if(getProblem.length==0){
+      const getProblem = await Problem.find({}).select("_id title description tags difficulty"); //return a array 
+      if(getProblem.length==0){
      return res.status(200).send(getProblem); 
    }
    }
@@ -203,12 +204,20 @@ const getAllProblem=async (req,res) =>{
 }
 const getSolvedProblemByUser=async (req,res) =>{
   try{
-   const count=req.result.problemSolved.length;
-   res.status(200).send(count);
+  
+   const userId=req.result._id;
+   //here the populate function fetch that information whose the problemSolved is denote             
+   const user=await User.findById(userId).populate({
+      path:"problemSolved",
+      //by the select we fetch info as our desire
+      select:"_id title difficulty tags"
+   });
+    res.status(200).send(user.problemSolved);
   }
    catch(err){
          res.status(500).send("Error: "+err);
    }
 }
+
 
 module.exports={CreateProblem,UpdateProblem,deleteProblem,getProblemById,getAllProblem,getSolvedProblemByUser};
