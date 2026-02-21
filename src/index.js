@@ -5,13 +5,14 @@ const main=require('../config/db');
 const cookieParser=require('cookie-parser'); //(npm i cookie-parser)
 const authRouter=require('../routes/userAuth');
 const client=require('../config/redis');
-const userMiddleware=require('../userMiddleware/userAuthMiddleware');
 const problemRouter=require('../routes/problemCreator')
+const submitRouter=require('../routes/submit');
 app.use(express.json());  //It convert req.body json data in java script object because through the req.body the data is come in json formate and we need in javascript formate same as in case of cookiese
 app.use(cookieParser());
 
 app.use("/user",authRouter);
 app.use("/problem", problemRouter);
+app.use("/submission",submitRouter);
 
 main()
 .then(async()=>{
