@@ -172,11 +172,14 @@ const getProblemById = async (req,res) =>{
    try{
 
      if(!id){
-        return res.status(400).send("Missing ID Field");
+      /* here by the .select() function we can provide data or field as per our
+       wish ans if we want that any particular field is not consider then we need to write (-) in that particular field
+       */
+        return res.status(400).send("Missing ID Field").select("_id title description tags difficulty visibleTestCases startCode"); 
       }
       const getProblem=await Problem.findById(id);
       if(!getProblem){
-        return res.status(400).send("Problem is Missing");
+        return res.status(400).send("Problem is Missing")
       }
 
        res.status(200).send(getProblem);
@@ -186,4 +189,16 @@ const getProblemById = async (req,res) =>{
    }
 }
 
-module.exports={CreateProblem,UpdateProblem,deleteProblem,getProblemById};
+const getAllProblem=async (req,res) =>{
+   try{
+      const getProblem = await Problem.find({}); //return a array 
+   if(getProblem.length==0){
+     return res.status(200).send(getProblem); 
+   }
+   }
+   catch(err){
+         res.status(500).send("Error: "+err);
+   }
+}
+
+module.exports={CreateProblem,UpdateProblem,deleteProblem,getProblemById,getAllProblem};

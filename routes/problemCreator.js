@@ -1,4 +1,4 @@
-const {CreateProblem,UpdateProblem,deleteProblem,getProblemById}=require('../controllers/userProblem');
+const {CreateProblem,UpdateProblem,deleteProblem,getProblemById,getAllProblem}=require('../controllers/userProblem');
 const express=require('express');
 const problemRouter=express.Router();
 const adminMiddleware=require('../userMiddleware/adminAuthMiddleware');
@@ -8,7 +8,7 @@ problemRouter.put("/:id",adminMiddleware,UpdateProblem);//update
  problemRouter.delete("/:id",adminMiddleware,deleteProblem);//delete
 
  problemRouter.get("/:id",userMiddleware,getProblemById);
-// problemRouter.get("/",userMiddleware,getAllProblem);
+ problemRouter.get("/",userMiddleware,getAllProblem);
 // problemRouter.get("/user",userMiddleware,getSolvedProblemByUser);
 
 module.exports=problemRouter;
