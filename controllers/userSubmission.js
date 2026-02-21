@@ -73,10 +73,16 @@ try{
      submittedResult.memory=memory;
 
      await submittedResult.save();
+
+
+     //we insert ProblemId  in problemSolved of userSchema and also we check that it repated problemId is not insert
+    // in req.result user Information 
+     if(!req.result.problemSolved.includes(problemId)){
+        req.result.problemSolved.push(problemId);
+        await req.result.save();
+     }
      res.status(201).send(submittedResult);
 }
-
-
 
 catch(err){
     res.status(500).send("Internal server error: "+err);
