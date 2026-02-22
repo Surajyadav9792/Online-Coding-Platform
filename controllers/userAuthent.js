@@ -3,7 +3,6 @@ const User=require("../model/user");
 const validate=require("../utils/validator")
 const bcrypt=require('bcrypt'); //(npm i bcrypt)
 const jwt=require("jsonwebtoken");//(npm install jsonwebtoken)
-const submission=require("../model/submission");
 const Submission = require("../model/submission");
 
 const register= async(req,res) =>{

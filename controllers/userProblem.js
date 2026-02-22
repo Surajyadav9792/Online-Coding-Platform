@@ -1,6 +1,7 @@
 const {getlanguageById,submitBatch,submitToken}=require("../utils/fetch_language_id");
 const Problem = require("../model/problem");
 const User=require("../model/user");
+const Submission = require("../model/submission");
 
 const CreateProblem=async (req,res)=>{
 
@@ -28,8 +29,9 @@ const CreateProblem=async (req,res)=>{
        expected_output:testcase.output 
     }));
 
-    // sending submissions to judge0
+    //sending submissions to judge0
     const submitResult=await submitBatch(submissions);
+   //  console.log(submitResult);
 
     // safety check if judge0 failed
     if(!submitResult || !Array.isArray(submitResult)){
@@ -38,6 +40,7 @@ const CreateProblem=async (req,res)=>{
 
     // extracting tokens from judge0 response
     const resultToken=submitResult.map((value)=>value.token);
+      // console.log(resultToken);
 
     // using tokens to fetch final result from judge0
     const testResult=await submitToken(resultToken);
@@ -56,7 +59,6 @@ const CreateProblem=async (req,res)=>{
     }
 
    }
-
    // if all reference solutions passed, store problem in DB
    await Problem.create({
         title,
@@ -219,5 +221,21 @@ const getSolvedProblemByUser=async (req,res) =>{
    }
 }
 
+const submittedProblem=async(req,res) =>{
+   try{
+        const userId=req.result._id;
+        const problemId=req.params._id;
 
-module.exports={CreateProblem,UpdateProblem,deleteProblem,getProblemById,getAllProblem,getSolvedProblemByUser};
+      const ans=  await Submission.find(userId,problemId);
+        if(ans.length==0){
+         res.status(200).send("No Submission is present");
+        }
+      res.status(200).send(ans);
+   }
+   catch(err){
+      res.status(200).send("Internal Server Error ");;
+   }
+}
+
+
+module.exports={CreateProblem,UpdateProblem,deleteProblem,getProblemById,getAllProblem,getSolvedProblemByUser,submittedProblem};

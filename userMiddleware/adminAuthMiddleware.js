@@ -17,7 +17,7 @@ const adminAuthMiddleware=async(req,res,next) =>{
         throw new Error("Invalid Token");
     }
     if(payload.role!='admin'){
-        throw new Error("Invalid token");
+        throw new Error("Invalid ttttoken");
     }
     const result = await User.findById(_id);//here we find the user on the basis of Id in model
     if(!result){
