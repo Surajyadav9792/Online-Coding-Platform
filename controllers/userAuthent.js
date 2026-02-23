@@ -14,6 +14,12 @@ const register= async(req,res) =>{
 
      const user=await User.create(req.body);
 
+     const reply={
+      firstName:user.firstName,
+      emailId:user.emailId,
+      _id:user._id
+     }
+
     const token=jwt.sign(
    {_id:user._id, emailId:user.emailId,role:user.role},
    process.env.JWT_KEY,
@@ -21,7 +27,12 @@ const register= async(req,res) =>{
    );
 
     res.cookie('token',token,{maxAge:60*60*1000});//cookies will expire given milisec time
-    res.status(201).send("user Registered Successfully");
+   //here we shall not only send msg we also send few necessary info of user with this msg 
+    //we send the info in json because by this we can send more information in key and value pair
+    res.status(201).json({
+      user:reply,
+      message:"user Registered Successfully"
+    })
     }
     catch(err){
       res.status(400).send("Error: "+err.message);
@@ -40,23 +51,31 @@ const login=async(req,res)=>{
        }
 
        //here we check the given email and password is present in our database or not
-       const result=await User.findOne({emailId});
+       const user=await User.findOne({emailId});
         if(!result){ 
         throw new Error("Invalid Email")
        }
        //here first we write palin password and then stored hash password
-       const match= await bcrypt.compare(password,result.password);
+       const match= await bcrypt.compare(password,user.password);
        if(!match){
         throw new Error("Invalid Password");
        }
+       const reply={
+      firstName:user.firstName,
+      emailId:user.emailId,
+      _id:user._id
+     }
         const token=jwt.sign(
-       {_id:result._id, emailId:result.emailId,role:result.role},
+       {_id:user._id, emailId:user.emailId,role:user.role},
         process.env.JWT_KEY,
        {expiresIn:60*60}
    );
 
     res.cookie('token',token,{maxAge:60*60*1000});//cookies will expire given milisec time
-    res.status(201).send("user login Successfully");
+    res.status(201).json({
+      user:reply,
+      message:"user login Successfully"
+    })
     }
 
     catch(err){
@@ -81,6 +100,7 @@ const adminRegister=async(req,res)=>{
      validate(req.body);
      req.body.password= await bcrypt.hash(req.body.password,10);
      const user=await User.create(req.body);
+     
 
     const token=jwt.sign(
    {_id:user._id, emailId:user.emailId,role:user.role},
