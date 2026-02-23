@@ -52,7 +52,7 @@ const login=async(req,res)=>{
 
        //here we check the given email and password is present in our database or not
        const user=await User.findOne({emailId});
-        if(!result){ 
+        if(!user){ 
         throw new Error("Invalid Email")
        }
        //here first we write palin password and then stored hash password

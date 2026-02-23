@@ -26,7 +26,7 @@ const userMiddleware=async(req,res,next) =>{
        throw new Error("Invalid Token");
      }
      // If not present then user data store in result
-     req.result=result;
+       req.result=result;
      next();
     }
     catch(err){
