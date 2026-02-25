@@ -1,33 +1,33 @@
 
 const Problem=require("../model/problem");
 const Submission=require("../model/submission")
-const {getlanguageById,submitBatch,submitToken}=require("../utils/fetch_language_id")
+const {getLanguageId,submitBatch,submitoken}=require("../utils/fetch_language_id")
 const submitCode=async (req,res) =>{
 try{
  const userId=req.result._id;
- const problemId=req.params._id;
-
+const problemId=req.params.problemId;
  const {code,language}=req.body;
  if(!userId||!problemId||!code||!language){
-    return res.status().send("Some field is Missing");
+    return res.status(400).send("Some field is Missing");
  }
 
  //Fetch the problem from database
  const problem=await Problem.findById(problemId);
 
 // first we store out submission then send it judge0 and after jugdge0 we update the submission
-  const submittedResult=await Submission.create({
-    userId,
-    problemId,
-    code,
-    testCasesPassed:0,
-    status:"pending",
-    testCasesTotal:problem.hiddenTestCases.length
-  })
+  const submittedResult = await Submission.create({
+  userId,
+  problemId,
+  code,
+  language,   
+  testCasesPassed: 0,
+  status: "pending",
+  testCasesTotal: problem.hiddenTestCases.length
+})
   // now arrange the data i judge0 formate and send it to judge0
 
    // get language id for judge0
-    const languageId=getlanguageById(language);
+    const languageId=getLanguageId(language);
 
      const submissions=problem.hiddenTestCases.map((testcase)=>({
        source_code:code,
@@ -40,7 +40,7 @@ try{
 
     const resultToken=submitResult.map((value)=>value.token);
 
-     const testResult=await submitToken(resultToken);
+     const testResult=await submitoken(resultToken);
     // console.log(testResult);
 
      //now we extract the information from testResult
@@ -91,18 +91,19 @@ catch(err){
 const runCode=async(req,res) =>{
    try{
  const userId=req.result._id;
- const problemId=req.params._id;
+const problemId=req.params.problemId;
 
+ 
  const {code,language}=req.body;
  if(!userId||!problemId||!code||!language){
-    return res.status().send("Some field is Missing");
+    return res.status(400).send("Some field is Missing");
  }
 
  //Fetch the problem from database
  const problem=await Problem.findById(problemId);
 
    // get language id for judge0
-    const languageId=getlanguageById(language);
+    const languageId=getLanguageId(language);
 
      const submissions=problem.visibleTestCases.map((testcase)=>({
        source_code:code,
@@ -111,14 +112,18 @@ const runCode=async(req,res) =>{
        expected_output:testcase.output 
     }));
 
+    
     const submitResult=await submitBatch(submissions);
 
     const resultToken=submitResult.map((value)=>value.token);
 
-     const testResult=await submitToken(resultToken);
+     const testResult=await submitoken(resultToken);
     // console.log(testResult);
  
      res.status(201).send(testResult);
+
+    
+
 }
 
 catch(err){
