@@ -7,7 +7,12 @@ const authRouter=require('../routes/userAuth');
 const client=require('../config/redis');
 const problemRouter=require('../routes/problemCreator')
 const submitRouter=require('../routes/submit');
+const cors=require('cors');
 
+app.use(cors({
+    origin:'https://localhost:5173',
+    credentials:true
+}))
 const runRoute =require('../routes/run');
 
 app.use(express.json());  //It convert req.body json data in java script object because through the req.body the data is come in json formate and we need in javascript formate same as in case of cookiese
